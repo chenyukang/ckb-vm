@@ -648,6 +648,7 @@ pub struct DefaultMachineBuilder<Inner> {
     instruction_cycle_func: Box<InstructionCycleFunc>,
     debugger: Option<Box<dyn Debugger<Inner>>>,
     syscalls: Vec<Box<dyn Syscalls<Inner>>>,
+    pause: Pause,
 }
 
 impl<Inner> DefaultMachineBuilder<Inner> {
@@ -657,6 +658,7 @@ impl<Inner> DefaultMachineBuilder<Inner> {
             instruction_cycle_func: Box::new(|_| 0),
             debugger: None,
             syscalls: vec![],
+            pause: Pause::new(),
         }
     }
 
@@ -678,10 +680,15 @@ impl<Inner> DefaultMachineBuilder<Inner> {
         self
     }
 
+    pub fn pause(mut self, pause: Pause) -> Self {
+        self.pause = pause;
+        self
+    }
+
     pub fn build(self) -> DefaultMachine<Inner> {
         DefaultMachine {
             inner: self.inner,
-            pause: Pause::new(),
+            pause: self.pause,
             instruction_cycle_func: self.instruction_cycle_func,
             debugger: self.debugger,
             syscalls: self.syscalls,
